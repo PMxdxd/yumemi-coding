@@ -198,6 +198,7 @@ let prefecturesTemp = [
 
 function App() {
   const [prefectures, setPrefectures] = useState<Prefecture[]>([]);
+  const [selectedPrefectures, setSelectedPrefectures] = useState<string[]>([]);
 
   useEffect(() => {
     const getPrefecturesFn = async () => {
@@ -206,12 +207,23 @@ function App() {
     };
     getPrefecturesFn();
   }, []);
+  
+  const changeCheckbox = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (selectedPrefectures.includes(e.target.value)) {
+      setSelectedPrefectures(
+        selectedPrefectures.filter((p) => p !== e.target.value)
+      );
+    } else {
+      setSelectedPrefectures([...selectedPrefectures, e.target.value]);
+    }
+  };
 
   const checkBoxs = prefectures.map((prefecture) => {
     return (
       <CheckBox
         key={prefecture.prefCode}
         prefectureInfo={prefecture}
+        onChange={changeCheckbox}
       ></CheckBox>
     );
   });
