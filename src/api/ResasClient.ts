@@ -11,3 +11,7 @@ const instance = axios.create({
 export const getPrefectures = () => {
   return instance.get('api/v1/prefectures');
 };
+
+export const getPopulationStructure = (prefCode:string) => {
+  return instance.get(`api/v1/population/composition/perYear?prefCode=${prefCode}&cityCode=-`);
+};

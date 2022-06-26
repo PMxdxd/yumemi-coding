@@ -2,8 +2,13 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import { Prefecture } from "./types";
 
-import { getPrefectures } from "./api/ResasClient";
-import { CheckBox } from "./components/CheckBox";
+import { getPrefectures, getPopulationStructure } from "./api/ResasClient";
+import { PrefectureList } from "./components/PrefectureList";
+
+import Highcharts from "highcharts";
+import Exporting from "highcharts/modules/exporting";
+import Graph from "./components/Graph";
+Exporting(Highcharts);
 
 let prefecturesTemp = [
   {
@@ -196,6 +201,14 @@ let prefecturesTemp = [
   },
 ];
 
+let populationData = {};
+
+const getPopulationStructureFn = async (prefCode: string) => {
+  // todo 既にAPI叩いてたら何もしない
+  const res = await getPopulationStructure(prefCode);
+  populationData[prefCode] = { data: res.data.result.data["0"].data };
+};
+
 function App() {
   const [prefectures, setPrefectures] = useState<Prefecture[]>([]);
   const [selectedPrefectures, setSelectedPrefectures] = useState<string[]>([]);
@@ -204,31 +217,38 @@ function App() {
     const getPrefecturesFn = async () => {
       const res = await getPrefectures();
       setPrefectures(res.data.result);
+      // setPrefectures(prefecturesTemp);
     };
     getPrefecturesFn();
   }, []);
-  
+
   const changeCheckbox = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (selectedPrefectures.includes(e.target.value)) {
       setSelectedPrefectures(
         selectedPrefectures.filter((p) => p !== e.target.value)
       );
     } else {
-      setSelectedPrefectures([...selectedPrefectures, e.target.value]);
+      getPopulationStructureFn(e.target.value).then(() => {
+        setSelectedPrefectures([...selectedPrefectures, e.target.value]);
+      });
     }
   };
 
-  const checkBoxs = prefectures.map((prefecture) => {
-    return (
-      <CheckBox
-        key={prefecture.prefCode}
-        prefectureInfo={prefecture}
-        onChange={changeCheckbox}
-      ></CheckBox>
-    );
-  });
-
-  return <div className="App">{checkBoxs}</div>;
+  return (
+    <>
+      <div className="App">
+        <header>
+          <h1 className="title">都道府県別総人口推移グラフ</h1>
+        </header>
+        <PrefectureList prefectures={prefectures} onChange={changeCheckbox} />
+        <Graph
+          populationData={populationData}
+          prefectures={prefectures}
+          selectedPrefectures={selectedPrefectures}
+        ></Graph>
+      </div>
+    </>
+  );
 }
 
 export default App;
