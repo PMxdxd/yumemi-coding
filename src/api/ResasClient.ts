@@ -12,6 +12,6 @@ export const getPrefectures = () => {
   return instance.get('api/v1/prefectures');
 };
 
-export const getPopulationStructure = (prefCode:string) => {
+export const getPopulationStructure = (prefCode:number) => {
   return instance.get(`api/v1/population/composition/perYear?prefCode=${prefCode}&cityCode=-`);
 };

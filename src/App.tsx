@@ -201,9 +201,11 @@ let prefecturesTemp = [
   },
 ];
 
-let populationData = {};
+let populationData: {
+  [prefCode: number]: { data: { year: number; value: number } };
+} = {};
 
-const getPopulationStructureFn = async (prefCode: string) => {
+const getPopulationStructureFn = async (prefCode: number) => {
   // todo 既にAPI叩いてたら何もしない
   const res = await getPopulationStructure(prefCode);
   populationData[prefCode] = { data: res.data.result.data["0"].data };
@@ -228,7 +230,7 @@ function App() {
         selectedPrefectures.filter((p) => p !== e.target.value)
       );
     } else {
-      getPopulationStructureFn(e.target.value).then(() => {
+      getPopulationStructureFn(Number(e.target.value)).then(() => {
         setSelectedPrefectures([...selectedPrefectures, e.target.value]);
       });
     }

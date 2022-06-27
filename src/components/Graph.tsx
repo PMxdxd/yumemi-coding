@@ -4,7 +4,9 @@ import HighchartsReact from "highcharts-react-official";
 import { Prefecture } from "../types";
 
 type Props = {
-  populationData: any;
+  populationData: {
+    [prefCode: number]: { data: { year: number; value: number } };
+  };
   prefectures: Prefecture[];
   selectedPrefectures: string[];
 };
@@ -23,9 +25,10 @@ const Graph: React.FC<Props> = ({
     series.push({
       type: "line",
       name: prefectures[parseInt(prefCode) - 1].prefName,
-      data: populationData[prefCode].data
+      data: populationData[Number(prefCode)].data
         .filter(
-          (d) => parseInt(d.year) >= minYear && parseInt(d.year) <= maxYear
+          (d) =>
+            parseInt(d.year) >= minYear && parseInt(d.year) <= maxYear
         )
         .map((d) => [d.year, d.value]),
     });
